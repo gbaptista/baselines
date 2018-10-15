@@ -113,6 +113,7 @@ def learn(env,
           param_noise=False,
           callback=None,
           load_path=None,
+          step_callback=None,
           **network_kwargs
             ):
     """Train a deepq model.
@@ -278,7 +279,11 @@ def learn(env,
             action = act(np.array(obs)[None], update_eps=update_eps, **kwargs)[0]
             env_action = action
             reset = False
-            new_obs, rew, done, _ = env.step(env_action)
+            new_obs, rew, done, _info = env.step(env_action)
+
+            if step_callback:
+                step_callback(new_obs, rew, done, _info)
+
             # Store transition in the replay buffer.
             replay_buffer.add(obs, action, rew, new_obs, float(done))
             obs = new_obs
